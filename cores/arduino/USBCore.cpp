@@ -33,6 +33,7 @@ volatile u8 RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
 
 extern const u16 STRING_LANGUAGE[] PROGMEM;
 extern const u8 STRING_PRODUCT[] PROGMEM;
+extern const u8 STRING_SERIAL[] PROGMEM;
 extern const u8 STRING_MANUFACTURER[] PROGMEM;
 extern const DeviceDescriptor USB_DeviceDescriptorIAD PROGMEM;
 
@@ -41,30 +42,32 @@ const u16 STRING_LANGUAGE[2] = {
 	0x0409	// English
 };
 
-#ifndef USB_PRODUCT
-// If no product is provided, use USB IO Board
-#define USB_PRODUCT     "USB IO Board"
+#if defined(USB_PRODUCT)
+#  undef USB_PRODUCT
 #endif
+#define USB_PRODUCT "CHANGEME GAMING MOUSE NAME"
+
+#if defined(USB_MANUFACTURER)
+#  undef USB_MANUFACTURER
+#endif
+#define USB_MANUFACTURER "CHANGEME"
+
+#if defined(USB_SERIAL)
+#  undef USB_SERIAL
+#endif
+#define USB_SERIAL "CHANGEMECHANGEMECHANGEME"
+
+
+#if defined(USB_CUSTOMSTR)
+#  undef USB_CUSTOMSTR
+#endif
+#define USB_CUSTOMSTR "CHANGEME"
+
 
 const u8 STRING_PRODUCT[] PROGMEM = USB_PRODUCT;
-
-#if USB_VID == 0x2341
-#  if defined(USB_MANUFACTURER)
-#    undef USB_MANUFACTURER
-#  endif
-#  define USB_MANUFACTURER "Arduino LLC"
-#elif USB_VID == 0x1b4f
-#  if defined(USB_MANUFACTURER)
-#    undef USB_MANUFACTURER
-#  endif
-#  define USB_MANUFACTURER "SparkFun"
-#elif !defined(USB_MANUFACTURER)
-// Fall through to unknown if no manufacturer name was provided in a macro
-#  define USB_MANUFACTURER "Unknown"
-#endif
-
 const u8 STRING_MANUFACTURER[] PROGMEM = USB_MANUFACTURER;
-
+const u8 STRING_SERIAL[45] PROGMEM = USB_SERIAL;
+const u8 STRING_CUSTOMSTR[] PROGMEM = USB_CUSTOMSTR;
 
 #define DEVICE_CLASS 0x02
 
@@ -79,7 +82,7 @@ const DeviceDescriptor USB_DeviceDescriptorIAD =
 // but doesn't make much sense as a default for custom devices when CDC is disabled.
 // (0x00 means "Use class information in the Interface Descriptors" which should be generally ok)
 const DeviceDescriptor USB_DeviceDescriptorIAD =
-	D_DEVICE(0x00,0x00,0x00,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,ISERIAL,1);
+	D_DEVICE(0x00,0x00,0x00,64,CHANGEME,CHANGEME,CHANGEME,IMANUFACTURER,IPRODUCT,ISERIAL,1);
 #endif
 
 //==================================================================
@@ -541,11 +544,10 @@ bool SendDescriptor(USBSetup& setup)
 			return USB_SendStringDescriptor(STRING_MANUFACTURER, strlen(USB_MANUFACTURER), TRANSFER_PGM);
 		}
 		else if (setup.wValueL == ISERIAL) {
-#ifdef PLUGGABLE_USB_ENABLED
-			char name[ISERIAL_MAX_LEN];
-			PluggableUSB().getShortName(name);
-			return USB_SendStringDescriptor((uint8_t*)name, strlen(name), 0);
-#endif
+			return USB_SendStringDescriptor(STRING_SERIAL, strlen(USB_SERIAL), TRANSFER_PGM);
+		}
+		else if (setup.wValueL == 0x04) {
+			return USB_SendStringDescriptor(STRING_CUSTOMSTR, strlen(USB_CUSTOMSTR), TRANSFER_PGM);
 		}
 		else
 			return false;

@@ -59,7 +59,7 @@ const USB_Descriptor_Device_t DeviceDescriptor =
 
 	.ManufacturerStrIndex   = 0x02,
 	.ProductStrIndex        = 0x01,
-	.SerialNumStrIndex      = NO_DESCRIPTOR,
+	.SerialNumStrIndex      = 0x03,
 
 	.NumberOfConfigurations = FIXED_NUM_CONFIGURATIONS
 };
@@ -181,7 +181,6 @@ const USB_Descriptor_Configuration_t ConfigurationDescriptor =
 const USB_Descriptor_String_t LanguageString =
 {
 	.Header                 = {.Size = USB_STRING_LEN(1), .Type = DTYPE_String},
-
 	.UnicodeString          = {LANGUAGE_ID_ENG}
 };
 
@@ -191,28 +190,26 @@ const USB_Descriptor_String_t LanguageString =
  */
 const USB_Descriptor_String_t ProductString =
 {
-	.Header                 = {.Size = USB_STRING_LEN(16), .Type = DTYPE_String},
-
-	#if DEVICE_PID == 0x0036
-	.UnicodeString          = L"Arduino Leonardo" 
-	#elif DEVICE_PID == 0x0037
-	.UnicodeString			= L"Arduino Micro   "
-	#elif DEVICE_PID == 0x003C
-	.UnicodeString			= L"Arduino Esplora "
-	#else
-	.UnicodeString			= L"USB IO board    "
-	#endif
+	.Header                 = {.Size = USB_STRING_LEN(33), .Type = DTYPE_String},
+	.UnicodeString          = L"CHANGEMECHANGEMECHANGEMEchange" 
 };
 
 const USB_Descriptor_String_t ManufNameString = 
 {
-	.Header					= {.Size = USB_STRING_LEN(11), .Type = DTYPE_String},
-	
-	#if DEVICE_VID == 0x2341
-	.UnicodeString			= L"Arduino LLC"
-	#else
-	.UnicodeString			= L"Unknown    "
-	#endif
+	.Header					= {.Size = USB_STRING_LEN(8), .Type = DTYPE_String},
+	.UnicodeString			= L"CHANGEME"
+};
+
+const USB_Descriptor_String_t SerialNumStr = 
+{
+	.Header					= {.Size = USB_STRING_LEN(8), .Type = DTYPE_String},
+	.UnicodeString			= L"CHANGEME"
+};
+
+const USB_Descriptor_String_t CustomStr = 
+{
+	.Header					= {.Size = USB_STRING_LEN(32), .Type = DTYPE_String},
+	.UnicodeString			= L"CHANGEME"
 };
 
 /** This function is called by the library when in device mode, and must be overridden (see LUFA library "USB Descriptors"
@@ -255,7 +252,17 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
 			{
 				Address = &ManufNameString;
 				Size	= ManufNameString.Header.Size;
+			} else if (DescriptorNumber == DeviceDescriptor.SerialNumStrIndex)
+			{
+				Address = &SerialNumStr;
+				Size	= SerialNumStr.Header.Size;
+			} else if (DescriptorNumber == 0x04)
+			{
+				Address = &CustomStr;
+				Size	= CustomStr.Header.Size;
 			}
+			
+			
 
 			break;
 	}

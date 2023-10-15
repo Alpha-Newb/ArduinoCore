@@ -95,7 +95,7 @@ public:
   int begin(void);
   int SendReport(uint8_t id, const void* data, int len);
   void AppendDescriptor(HIDSubDescriptor* node);
-
+  int RegisterReportReceiver(uint8_t id, void(*reportReceiver)(const void *data, int len));
 protected:
   // Implementation of the PluggableUSBModule
   int getInterface(uint8_t* interfaceCount);
@@ -111,6 +111,8 @@ private:
 
   uint8_t protocol;
   uint8_t idle;
+  uint8_t receiverId;
+  void(*reportReceiver)(const void *data, int len);
 };
 
 // Replacement for global singleton.

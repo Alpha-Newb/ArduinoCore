@@ -95,10 +95,10 @@
 #define USB_CONFIG_SELF_POWERED                0xC0
 #define USB_CONFIG_REMOTE_WAKEUP               0x20
 
-// bMaxPower in Configuration Descriptor
+// bMaxPower in Configuration Descriptor - Mouse power modified to match real mouse
 #define USB_CONFIG_POWER_MA(mA)                ((mA)/2)
 #ifndef USB_CONFIG_POWER
- #define USB_CONFIG_POWER                      (500)
+ #define USB_CONFIG_POWER                      (420)
 #endif
 
 // bEndpointAddress in Endpoint Descriptor
@@ -269,8 +269,9 @@ typedef struct
 #define D_DEVICE(_class,_subClass,_proto,_packetSize0,_vid,_pid,_version,_im,_ip,_is,_configs) \
 	{ 18, 1, USB_VERSION, _class,_subClass,_proto,_packetSize0,_vid,_pid,_version,_im,_ip,_is,_configs }
 
+//Mouse power modified to match real mouse
 #define D_CONFIG(_totalLength,_interfaces) \
-	{ 9, 2, _totalLength,_interfaces, 1, 0, USB_CONFIG_BUS_POWERED | USB_CONFIG_REMOTE_WAKEUP, USB_CONFIG_POWER_MA(USB_CONFIG_POWER) }
+	{ 9, 2, _totalLength,_interfaces, 1, 0, USB_CONFIG_BUS_POWERED | USB_CONFIG_REMOTE_WAKEUP, USB_CONFIG_POWER_MA(420) }
 
 #define D_INTERFACE(_n,_numEndpoints,_class,_subClass,_protocol) \
 	{ 9, 4, _n, 0, _numEndpoints, _class,_subClass, _protocol, 0 }
